@@ -1,0 +1,19 @@
+import { defineStore } from 'pinia'
+import axios from 'axios'
+const API = "https://68648e915b5d8d03397d8138.mockapi.io/api/v1";
+export const useUsersStore = defineStore('users', {
+  state: () => ({users: [],loading: false}),
+  getters:{
+    getUsers:(state) => state.users,
+    isLoading:(state) => state.loading
+  },
+  actions:{
+      async fetchUsers(){
+        this.loading = true;
+        const res = await axios.get(`${API}/users`);
+        this.users = res.data;
+        this.loading = false;
+      }
+  }
+
+})

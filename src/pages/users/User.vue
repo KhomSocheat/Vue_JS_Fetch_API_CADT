@@ -63,16 +63,17 @@
     </div>
 </template>
 <script>
-  import axios from 'axios';
+import axios from 'axios';
+import { useUsersStore } from '@/Store/usersStore';
+import { mapActions,mapState } from 'pinia';
+
 const API = "https://68648e915b5d8d03397d8138.mockapi.io/api/v1";
 export default {
   data() {
     return {
-      page: 'users',
-      page: 'articles',
 
       //users data that will be fetched from API
-      users: [],
+
       //end users data
 
       //create user form data
@@ -97,18 +98,22 @@ export default {
       editFormArticle: {},
     }
   },
+  computed:{
+    ...mapState(useUsersStore,{users: 'getUsers',loading: 'isLoading'})
+  },
   methods: {
     //fetch users
-    async fetchUsers() {
-      this.loading = true;
-      try {
-        const res = await axios.get(`${API}/users`);
-        this.users = res.data;
-      } catch {
-        console.error(err);
-      }
-      this.loading = false;
-    },
+    ...mapActions(useUsersStore,['fetchUsers']),
+    // async fetchUsers() {
+    //   this.loading = true;
+    //   try {
+    //     const res = await axios.get(`${API}/users`);
+    //     this.users = res.data;
+    //   } catch {
+    //     console.error(err);
+    //   }
+    //   this.loading = false;
+    // },
     //end fetch users
     //create user
     async createUser(){
