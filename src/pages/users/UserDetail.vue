@@ -13,27 +13,27 @@
 
       <!-- Display user details when loaded -->
       <div v-else-if="user" class="bg-white p-6 rounded shadow">
-        <h1 class="text-3xl font-bold mb-4">{{ user.name }}</h1>
+        <h1 class="text-3xl font-bold mb-4">{{ getUserById($route.params.UserId).name }}</h1>
 
         <div class="space-y-3">
           <div>
             <span class="font-semibold">Email:</span>
-            <span class="ml-2">{{ user.email }}</span>
+            <span class="ml-2">{{ getUserById($route.params.UserId).email }}</span>
           </div>
 
           <div>
             <span class="font-semibold">Salary:</span>
-            <span class="ml-2">{{ user.salary }} $</span>
+            <span class="ml-2">{{ getUserById($route.params.UserId).salary }} $</span>
           </div>
 
           <div>
             <span class="font-semibold">Major:</span>
-            <span class="ml-2">{{ user.major }}</span>
+            <span class="ml-2">{{ getUserById($route.params.UserId).major }}</span>
           </div>
 
           <div>
             <span class="font-semibold">User ID:</span>
-            <span class="ml-2">{{ user.id }}</span>
+            <span class="ml-2">{{ getUserById($route.params.UserId).id }}</span>
           </div>
         </div>
 
@@ -43,48 +43,61 @@
     </main>
 </template>
 
-<script>
+<script setup>
 import axios from 'axios';
-
+import { useUsersStore } from '@/Store/usersStore';
+import { mapState } from 'pinia';
 // API base URL - same as your Home.vue
-const API = "https://68648e915b5d8d03397d8138.mockapi.io/api/v1";
+// const API = "https://68648e915b5d8d03397d8138.mockapi.io/api/v1";
+import { onMounted } from 'vue';
+import { useRoute } from 'vue-router';
 
-export default {
-  name: 'UserDetail',
-  // Receive the user ID from route params
-  props: ['id'],
+const route = useRoute();
 
-  data() {
-    return {
-      user: null,      // Store the user data
-      loading: false,  // Loading state
-      error: null      // Error message
-    }
-  },
+onMounted(() => {
+  const userId = route.params.UserId;
+  console.log(userId);
+})
 
-  methods: {
-    // Fetch user details by ID from the API
-    async fetchUserDetail() {
-      this.loading = true;
-      this.error = null;
 
-      try {
-        // Make API call to get specific user by ID
-        const response = await axios.get(`${API}/users/${this.id}`);
-        this.user = response.data;
-      } catch (err) {
-        // Handle errors (user not found, network error, etc.)
-        console.error('Error fetching user:', err);
-        this.error = 'Failed to load user details. User may not exist.';
-      } finally {
-        this.loading = false;
-      }
-    }
-  },
+// export default {
+//   name: 'UserDetail',
+//   // Receive the user ID from route params
+//   props: ['id'],
 
-  // Fetch user data when component is mounted
-  mounted() {
-    this.fetchUserDetail();
-  }
-}
+//   data() {
+//     return {
+//       user: null,      // Store the user data
+//       loading: false,  // Loading state
+//       error: null      // Error message
+//     }
+//   },
+//   computed:{
+//     ...mapState(useUsersStore,{getUserById: 'getUsersByID',loading: 'isLoading'})
+//   },
+//   methods: {
+//     // Fetch user details by ID from the API
+//     // async fetchUserDetail() {
+//     //   this.loading = true;
+//     //   this.error = null;
+
+//     //   try {
+//     //     // Make API call to get specific user by ID
+//     //     const response = await axios.get(`${API}/users/${this.id}`);
+//     //     this.user = response.data;
+//     //   } catch (err) {
+//     //     // Handle errors (user not found, network error, etc.)
+//     //     console.error('Error fetching user:', err);
+//     //     this.error = 'Failed to load user details. User may not exist.';
+//     //   } finally {
+//     //     this.loading = false;
+//     //   }
+//     // }
+//   },
+
+//   // Fetch user data when component is mounted
+//   mounted() {
+//     const userId = this.$route.params.UserId;
+//   }
+// }
 </script>

@@ -62,113 +62,151 @@
       </div>
     </div>
 </template>
-<script>
+<script setup>
 import axios from 'axios';
 import { useUsersStore } from '@/Store/usersStore';
-import { mapActions,mapState } from 'pinia';
 
+import { useRouter } from 'vue-router';
+import { ref,onMounted } from 'vue';
+import { storeToRefs } from 'pinia';
 const API = "https://68648e915b5d8d03397d8138.mockapi.io/api/v1";
-export default {
-  data() {
-    return {
+// const loading = ref(false);
+const editingUser = ref(null);
+const formUser = ref({ name: '', email: '', age: '', major: '', salary: '' });
+const editForm = ref({});
+const router = useRouter();
 
-      //users data that will be fetched from API
 
-      //end users data
+const usersStore = useUsersStore();
+const {fetchUsers} = usersStore;
+const {getLoading : loading ,getUsers: users} = storeToRefs(usersStore);
 
-      //create user form data
-      formUser: { name: '', email: '', age: '', major: '', salary: '' },
-      //end create user form data
-
-      //editing user id
-      editingUser: null,
-      //end editing user id
-
-      //edit form data
-      editForm: {},
-      //end edit form data
-
-      //articles data
-      articles: [],
-      //end articles data
-
-      loading: false,
-      formArticle: { text: '', byUser: '' },
-      editingArticle: null,
-      editFormArticle: {},
-    }
-  },
-  computed:{
-    ...mapState(useUsersStore,{users: 'getUsers',loading: 'isLoading'})
-  },
-  methods: {
-    //fetch users
-    ...mapActions(useUsersStore,['fetchUsers']),
-    // async fetchUsers() {
-    //   this.loading = true;
-    //   try {
-    //     const res = await axios.get(`${API}/users`);
-    //     this.users = res.data;
-    //   } catch {
-    //     console.error(err);
-    //   }
-    //   this.loading = false;
-    // },
-    //end fetch users
-    //create user
-    async createUser(){
-      //create user
-      await axios.post(`${API}/users`,this.formUser);
-      //end create user
-
-      //reset form
-        this.formUser = { name: '', email: '', age: '', major: '', salary: '' };
-      //end reset form
-
-      //refresh user list
-       this.fetchUsers();
-      //end refresh user list
-    },
-    //end create user
-
-    //edit user
-    editUser(u){
-      //set editing user id
-      this.editingUser = u.id;
-      //end set editing user id
-
-      //populate edit form with user data
-      this.editForm = { ...u };
-      //end populate edit form with user data
-    },
-    //end edit user
-
-    //update user
-      async updateUser() {
-      await axios.put(`${API}/users/${this.editingUser}`, this.editForm);
-      this.editingUser = null;
-      this.fetchUsers();
-    },
-    //end update user
-
-    //delete user
-    async deleteUser(id) {
-      await axios.delete(`${API}/users/${id}`);
-      this.fetchUsers();
-    },
-    //end delete user
-
-    //navigate to user detail page
-    navigateToUser(id) {
-      this.$router.push({ name: 'UserDetail', params: { id: id } });
-    },
-    //end navigate to user detail page
-  },
-  mounted() {
-    //fetch users when component is mounted
-    this.fetchUsers();
-  }
+const navigateToUser = (id) => {
+    router.push(`/users/${id}`)
 }
+const createUser = async () =>{
+  await axios.post(`${API}/users`,formUser.value);
+  formUser.value = { name: '', email: '', age: '', major: '', salary: '' };
+}
+const editUser = (u) =>{
+  editingUser.value = u.id;
+  editForm.value = { ...u };
+}
+const updateUser = async () =>{
+  await axios.put(`${API}/users/${editingUser.value}`,editForm.value);
+  editingUser.value = null;
+  await fetchUsers();
+}
+
+const deleteUser = async (id) =>{
+  await axios.delete(`${API}/users/${id}`);
+  await fetchUsers();
+}
+onMounted( async() =>{
+  await fetchUsers();
+});
+
+// export default {
+//   data() {
+//     return {
+
+//       //users data that will be fetched from API
+
+//       //end users data
+
+//       //create user form data
+//       formUser: { name: '', email: '', age: '', major: '', salary: '' },
+//       //end create user form data
+
+//       //editing user id
+//       editingUser: null,
+//       //end editing user id
+
+//       //edit form data
+//       editForm: {},
+//       //end edit form data
+
+//       //articles data
+//       articles: [],
+//       //end articles data
+
+//       loading: false,
+//       formArticle: { text: '', byUser: '' },
+//       editingArticle: null,
+//       editFormArticle: {},
+//     }
+//   },
+//   computed:{
+//     ...mapState(useUsersStore,{users: 'getUsers',loading: 'isLoading'})
+//   },
+//   methods: {
+//     //fetch users
+//     ...mapActions(useUsersStore,['fetchUsers']),
+//     // async fetchUsers() {
+//     //   this.loading = true;
+//     //   try {
+//     //     const res = await axios.get(`${API}/users`);
+//     //     this.users = res.data;
+//     //   } catch {
+//     //     console.error(err);
+//     //   }
+//     //   this.loading = false;
+//     // },
+//     //end fetch users
+//     //create user
+//     async createUser(){
+//       //create user
+//       await axios.post(`${API}/users`,this.formUser);
+//       //end create user
+
+//       //reset form
+//         this.formUser = { name: '', email: '', age: '', major: '', salary: '' };
+//       //end reset form
+
+//       //refresh user list
+//        this.fetchUsers();
+//       //end refresh user list
+//     },
+//     //end create user
+
+//     //edit user
+//     editUser(u){
+//       //set editing user id
+//       this.editingUser = u.id;
+//       //end set editing user id
+
+//       //populate edit form with user data
+//       this.editForm = { ...u };
+//       //end populate edit form with user data
+//     },
+//     //end edit user
+
+//     //update user
+//       async updateUser() {
+//       await axios.put(`${API}/users/${this.editingUser}`, this.editForm);
+//       this.editingUser = null;
+//       this.fetchUsers();
+//     },
+//     //end update user
+
+//     //delete user
+//     async deleteUser(id) {
+//       await axios.delete(`${API}/users/${id}`);
+//       this.fetchUsers();
+//     },
+//     //end delete user
+
+//     //navigate to user detail page
+//     navigateToUser(id) {
+//       this.$router.push({ name: 'UserDetail', params: { id: id } });
+//     },
+//     //end navigate to user detail page
+//   },
+//   mounted() {
+//     //fetch users when component is mounted
+//     this.fetchUsers();
+//   }
+// }
 
 
 </script>

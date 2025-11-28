@@ -5,6 +5,9 @@ export const useUsersStore = defineStore('users', {
   state: () => ({users: [],loading: false}),
   getters:{
     getUsers:(state) => state.users,
+    getUsersByID : (state) => {
+      return (id) => state.users.find(user => user.id === id)
+    },
     isLoading:(state) => state.loading
   },
   actions:{
